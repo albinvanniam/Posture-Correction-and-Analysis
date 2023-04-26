@@ -1,6 +1,6 @@
 # Posture-Correction-and-Analysis
 
-This is a project that is done during the final year of Btech. Information Technology. 
+This is a project that is done during the Final year of Btech. Information Technology. 
 
 It Analyses User's posture through hardware and give alerts and statistics for Posture correction. 
 
