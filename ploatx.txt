@@ -1,0 +1,96 @@
+package com.example.postureapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class Plotax extends AppCompatActivity {
+    GraphView graphView;
+    Cursor cur;
+    TextView tv1,tv2;
+    @SuppressLint("Range")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_plotax);
+        graphView = findViewById(R.id.idGraphView);
+        tv1=(TextView)findViewById(R.id.gd);
+        tv2=(TextView)findViewById(R.id.bid);
+        int gcount=0;
+        int bcount=0;
+        List<Float> list=new ArrayList<Float>();
+        try {
+            datab dd = new datab(Plotax.this);
+            SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
+            Date todayDate = new Date();
+            String thisDate = currentDate.format(todayDate);
+            cur = dd.getsensorvalue(thisDate);
+
+            while (cur.moveToNext()) {
+                float val= Float.parseFloat( cur.getString(cur.getColumnIndex("axcol")));
+                Log.e("axval==>", val+"");
+                list.add(val);
+                if (val<8 & val>6){
+                    gcount=gcount+1;
+                }
+                else {
+                    bcount=bcount+1;
+                }
+
+
+            }
+        }
+        catch (Exception e){
+            Log.e("error: ", e+"");
+
+        }
+
+        Log.e("Bcount==>",bcount+"");
+        Log.e("Gcount==>",gcount+"");
+        tv1.setText(gcount+"");
+        tv2.setText(bcount+"");
+
+
+        DataPoint[] dataPoints = new DataPoint[list.size()]; // declare an array of DataPoint objects with the same size as your list
+
+        for (int i = 0; i < list.size(); i++) {
+
+            dataPoints[i] = new DataPoint(i, list.get(i)); // not sure but I think the second argument should be of type double
+        }
+
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints); // This one should be obvious right? :)
+        // after adding data to our line graph series.
+        // on below line we are setting
+        // title for our graph view.
+        graphView.setTitle("My Graph View");
+
+        // on below line we are setting
+        // text color to our graph view.
+        graphView.setTitleColor(R.color.purple_200);
+
+        // on below line we are setting
+        // our title text size.
+        graphView.setTitleTextSize(18);
+
+        // on below line we are adding
+        // data series to our graph view.
+        graphView.addSeries(series);
+
+        double max_x = list.size();
+        graphView.getViewport().setXAxisBoundsManual(true);
+        graphView.getViewport().setMaxX(max_x);
+    }
+}
